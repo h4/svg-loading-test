@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Тестирование SVG</title>
+</head>
+<body>
+    <p>Done in, ms<br>
+        <strong id="result"></strong>
+    </p>
+    <p>Called, times<br>
+        <strong id="counter"></strong>
+    </p>
+    <div id="container"></div>
+    <script type="text/javascript" src="http://yandex.st/jquery/1.10.0/jquery.min.js"></script>
+
+    <script>
+        var sources = {{ sources|safe }};
+    </script>
+
+    <script>
+        var elem;
+        var i = 0;
+        var n = sources.length;
+        var loaded = n;
+        var result = document.getElementById('result');
+        var counter = document.getElementById('counter');
+        var container = document.getElementById('container');
+        var start = (new Date()).getTime();
+
+        function showResult() {
+            var end = (new Date()).getTime();
+            var time = (end - start).toString();
+
+            $.post('/stat/', {time: time})
+                    .success(function(data) {
+                        data = JSON.parse(data);
+                        result.innerHTML = data.time;
+                        counter.innerHTML = data.count;
+                    });
+        }
+
+        function onImageLoad() {
+            loaded--;
+
+            if (!loaded) {
+                showResult();
+            }
+        }
+
+        for (i; i < n; i++) {
+            elem = document.createElement('img');
+            elem.src = sources[i];
+            container.appendChild(elem);
+
+            elem.onload = onImageLoad;
+        }
+    </script>
+</body>
+</html>
