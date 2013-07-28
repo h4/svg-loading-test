@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тестирование svg</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <div id="result"></div>
+    <div id="containter"></div>
+    <script type="text/javascript">
+        var elem;
+        var n = 15;
+        var loaded = n;
+        var container = document.getElementById('containter');
+        var start = (new Date()).getTime();
+
+        function end() {
+            var end = (new Date()).getTime();
+
+            result.innerHTML = end + '<br>' + start + "<br>" + (end - start).toString();
+        }
+
+        while (n) {
+            elem = document.createElement('img');
+            elem.src = "tiger.svg";
+            container.appendChild(elem);
+
+            elem.onload = function() {
+                loaded--;
+
+                if (!loaded) {
+                    end();
+                }
+            };
+
+            n -= 1;
+        }
+    </script>
+</body>
+</html>
