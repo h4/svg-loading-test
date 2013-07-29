@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Тестирование SVG</title>
+</head>
+<body>
+    <h1>Тесты скорости отображения svg-изображений</h1>
+
+    <h2>Без сброса кеша</h2>
+
+    <ul>
+        <li><a href="/test/external/0/">Внешний файл</a></li>
+        <li><a href="/test/embedded/0/">data-uri</a></li>
+        <li><a href="/test/encoded/0/">data-uri + urlencoded</a></li>
+        <li><a href="/test/base64/0/">data-uri + base64</a></li>
+    </ul>
+
+    <h2>Принудительный сброс кеша</h2>
+
+    <ul>
+        <li><a href="/test/external/1/">Внешний файл</a></li>
+        <li><a href="/test/embedded/1/">data-uri</a></li>
+        <li><a href="/test/encoded/1/">data-uri + urlencoded</a></li>
+        <li><a href="/test/base64/1/">data-uri + base64</a></li>
+    </ul>
+</body>
+</html>

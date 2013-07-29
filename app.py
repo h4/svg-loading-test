@@ -38,11 +38,7 @@ def formatData(data, mode):
 
 @app.route('/')
 def main():
-    f = open('tiger.svg', 'r')
-    code = f.read()
-    ret = '<img src="data:image/svg+xml,{}">'.format(urllib2.quote(code))
-    response = make_response(ret)
-    return response
+    return render_template('index.html')
 
 
 @app.route('/test/<mode>/<cached>/')
