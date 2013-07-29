@@ -68,12 +68,13 @@ def stat():
     stat = db.stat
     data = {
         "time": request.form['time'],
+        "path": request.form['path'],
         "user_agent": user_agent,
         "created": time(),
     }
     stat.insert(data)
 
-    count = stat.find({"user_agent": user_agent}).count()
+    count = stat.find({"user_agent": user_agent, "path": request.form['path']}).count()
     res = json.dumps({'time':request.form['time'], 'count': count})
 
     return make_response(res)

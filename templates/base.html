@@ -32,7 +32,10 @@
             var end = (new Date()).getTime();
             var time = (end - start).toString();
 
-            $.post('/stat/', {time: time})
+            $.post('/stat/', {
+                time: time,
+                path: location.pathname
+            })
                     .success(function(data) {
                         data = JSON.parse(data);
                         result.innerHTML = data.time;
