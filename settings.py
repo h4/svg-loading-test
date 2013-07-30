@@ -8,3 +8,6 @@ class AppConfig(object):
 
 # Число итераций в тесте
 ITERATIONS_COUNT = 100
+
+# for error logging
+ADMINS = ['dev@brnv.ru',]

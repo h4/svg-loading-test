@@ -8,7 +8,7 @@ import uuid
 from flask import Flask, make_response, render_template, request, session
 from pymongo import MongoClient
 from time import time
-from settings import ITERATIONS_COUNT
+from settings import ITERATIONS_COUNT, ADMINS
 
 app = Flask('svg')
 app.config.from_object('settings.AppConfig')
@@ -117,6 +117,14 @@ def stat():
 
     return make_response(res)
 
+if not app.debug:
+    import logging
+    from logging.handlers import SMTPHandler
+    mail_handler = SMTPHandler('127.0.0.1',
+                               'server-error@svg.brnv.ru',
+                               ADMINS, 'YourApplication Failed')
+    mail_handler.setLevel(logging.ERROR)
+    app.logger.addHandler(mail_handler)
 
 if __name__ == '__main__':
     app.debug = True
