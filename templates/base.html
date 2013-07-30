@@ -13,7 +13,6 @@
         <strong id="counter"></strong>
     </p>
     <div id="container"></div>
-    <script type="text/javascript" src="http://yandex.st/jquery/1.10.0/jquery.min.js"></script>
 
     <script>
         var start = (new Date()).getTime();
@@ -30,25 +29,60 @@
         var counter = document.getElementById('counter');
         var container = document.getElementById('container');
 
+        function encodePostData(data) {
+            var elem;
+            var result = [];
+            for (elem in data) {
+                result.push(elem + '=' + encodeURIComponent(data[elem]));
+            }
+            return result.join('&');
+        }
+
+        function sendResult(url, data, method, callback) {
+            method = method || 'POST';
+            if (!callback) {
+                if (typeof method === "function") {
+                    callback = method;
+                    method = 'POST';
+                }
+            }
+            var xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.open(method, url, true);
+            xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xmlhttp.send(encodePostData(data));
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState != 4) {
+                    return;
+                }
+
+                if (xmlhttp.status == 200) {
+                    callback && callback(xmlhttp.responseText);
+                }
+            };
+        }
+
+        function statHandler(data) {
+            data = JSON.parse(data);
+
+            result.innerHTML = data.time;
+            counter.innerHTML = data.count;
+
+            if (data.count < iterCount) {
+                setTimeout(function () {
+                    location.reload();
+                }, 100);
+            }
+        }
+
         function showResult() {
             var end = (new Date()).getTime();
-            var time = (end - start).toString();
-
-            $.post('/stat/', {
-                time: time,
+            var data = {
+                time: (end - start).toString(),
                 path: location.pathname
-            })
-                    .success(function (data) {
-                        data = JSON.parse(data);
-                        result.innerHTML = data.time;
-                        counter.innerHTML = data.count;
+            };
 
-                        if (data.count < iterCount) {
-                            setTimeout(function () {
-                                location.reload();
-                            }, 100);
-                        }
-                    });
+            sendResult('/stat/', data, statHandler);
         }
 
         function onImageLoad() {
