@@ -15,6 +15,13 @@ app.config.from_object('settings.AppConfig')
 
 
 def getImage(fname, mode=None):
+    """
+    Получить содержимое файла изображения или ссылку на него
+
+    :param fname: имя файла
+    :param mode: вернуть имя файла или его содержимое
+    :return: str
+    """
     if mode is None:
         return '/{}'.format(fname)
     f = open(fname, 'r')
@@ -22,6 +29,13 @@ def getImage(fname, mode=None):
 
 
 def getRand(data, mode):
+    """
+    Добавление случайной порции данных для запрета кеширования
+
+    :param data: строка данных
+    :param mode: режим кодирования
+    :return: str
+    """
     rand = random.random() * time()
     if mode == 'external':
         return "{}?v={}".format(data, rand)
@@ -29,6 +43,13 @@ def getRand(data, mode):
 
 
 def formatData(data, mode):
+    """
+    Установка префикса для data-uri
+
+    :param data: строка данных
+    :param mode: режим кодирования
+    :return: str
+    """
     if mode == 'external':
         return data
     res = 'data:image/svg+xml;utf8,{}'.format(data)
@@ -44,8 +65,14 @@ def main():
     return render_template('index.html')
 
 
-@app.route('/test/<mode>/<cached>/')
-def test(mode, cached='0'):
+@app.route('/test/<mode>/<preventCache>/')
+def test(mode, preventCache='0'):
+    """
+    Вывод страницы теста
+
+    :param mode: режим вывода: external | embedded | encoded | base64
+    :param preventCache: запрет кеширования
+    """
     if 'uid' not in session:
         session['uid'] = uuid.uuid4()
 
@@ -55,7 +82,7 @@ def test(mode, cached='0'):
     else:
         res = getImage(imageName, mode)
 
-    if cached == '0':
+    if preventCache == '0':
         sources = [res for n in xrange(0, 15)]
     else:
         sources = [getRand(res, mode) for n in xrange(0, 15)]
@@ -65,6 +92,9 @@ def test(mode, cached='0'):
 
 @app.route('/stat/', methods=['POST',])
 def stat():
+    """
+    Сохранение статистических данных в MongoDB
+    """
     user_agent = request.user_agent.string
     client = MongoClient('localhost', 27017)
     db = client.svg
