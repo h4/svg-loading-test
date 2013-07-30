@@ -4,7 +4,8 @@ import urllib2
 import random
 import base64
 import json
-from flask import Flask, make_response, render_template, request, sessions
+import uuid
+from flask import Flask, make_response, render_template, request, session
 from pymongo import MongoClient
 from time import time
 from settings import ITERATIONS_COUNT
@@ -45,6 +46,9 @@ def main():
 
 @app.route('/test/<mode>/<cached>/')
 def test(mode, cached='0'):
+    if 'uid' not in session:
+        session['uid'] = uuid.uuid4()
+
     imageName = 'static/tiger.svg'
     if mode == 'external':
         res = getImage(imageName)
@@ -70,10 +74,15 @@ def stat():
         "path": request.form['path'],
         "user_agent": user_agent,
         "created": time(),
+        "uid": session['uid']
     }
     stat.insert(data)
 
-    count = stat.find({"user_agent": user_agent, "path": request.form['path']}).count()
+    count = stat.find({"path": request.form['path'], "uid": session['uid']}).count()
+
+    if count >= ITERATIONS_COUNT:
+        session.clear()
+
     res = json.dumps({'time':request.form['time'], 'count': count})
 
     return make_response(res)
