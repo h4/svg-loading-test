@@ -4,11 +4,13 @@ import urllib2
 import random
 import base64
 import json
-from flask import Flask, make_response, render_template, request
+from flask import Flask, make_response, render_template, request, sessions
 from pymongo import MongoClient
 from time import time
+from settings import ITERATIONS_COUNT
 
 app = Flask('svg')
+app.config.from_object('settings.AppConfig')
 
 
 def getImage(fname, mode=None):
@@ -53,7 +55,8 @@ def test(mode, cached='0'):
         sources = [res for n in xrange(0, 15)]
     else:
         sources = [getRand(res, mode) for n in xrange(0, 15)]
-    return render_template("base.html", sources=map(lambda x: formatData(x, mode), sources))
+    return render_template("base.html", sources=map(lambda x: formatData(x, mode), sources),
+                           iterCount=ITERATIONS_COUNT)
 
 
 @app.route('/stat/', methods=['POST',])
