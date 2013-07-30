@@ -29,6 +29,11 @@
         var counter = document.getElementById('counter');
         var container = document.getElementById('container');
 
+        /**
+         * Кодирование данных для передачи в POST-запросе
+         * @param {Object} data
+         * @returns {string}
+         */
         function encodePostData(data) {
             var elem;
             var result = [];
@@ -38,6 +43,13 @@
             return result.join('&');
         }
 
+        /**
+         * Асинхронная отправка данных
+         * @param {String} url адрес запроса
+         * @param {Object} data данные
+         * @param {String|Function} [method] метод передачи данных
+         * @param {Function} [callback] функция-обработчик успешного вызова
+         */
         function sendResult(url, data, method, callback) {
             method = method || 'POST';
             if (!callback) {
@@ -62,20 +74,36 @@
             };
         }
 
+        /**
+         * Обработчик ответа от xmlhttp
+         *
+         * @param {String} data
+         */
         function statHandler(data) {
             data = JSON.parse(data);
 
             result.innerHTML = data.time;
             counter.innerHTML = data.count;
 
-            if (data.count < iterCount) {
+            checkIterationState(data.count);
+        }
+
+        /**
+         * Проверка достижения нужного числа итераций
+         * @param {Number} iterNum
+         */
+        function checkIterationState(iterNum) {
+            if (iterNum < iterCount) {
                 setTimeout(function () {
                     location.reload();
                 }, 100);
             }
         }
 
-        function showResult() {
+        /**
+         * Вычисление результатов и отправка статистики
+         */
+        function getResult() {
             var end = (new Date()).getTime();
             var data = {
                 time: (end - start).toString(),
@@ -85,11 +113,14 @@
             sendResult('/stat/', data, statHandler);
         }
 
+        /**
+         * Обработчик загрузки изображения
+         */
         function onImageLoad() {
             loaded--;
 
             if (!loaded) {
-                showResult();
+                getResult();
             }
         }
 
