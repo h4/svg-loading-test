@@ -22,13 +22,13 @@
 
     <script>
         var elem;
+        var iterCount = {{ iterCount }};
         var i = 0;
         var n = sources.length;
         var loaded = n;
         var result = document.getElementById('result');
         var counter = document.getElementById('counter');
         var container = document.getElementById('container');
-        
 
         function showResult() {
             var end = (new Date()).getTime();
@@ -38,10 +38,16 @@
                 time: time,
                 path: location.pathname
             })
-                    .success(function(data) {
+                    .success(function (data) {
                         data = JSON.parse(data);
                         result.innerHTML = data.time;
                         counter.innerHTML = data.count;
+
+                        if (data.count < iterCount) {
+                            setTimeout(function () {
+                                location.reload();
+                            }, 100);
+                        }
                     });
         }
 
