@@ -31,7 +31,7 @@
             var links = Array.prototype.slice.call(document.links);
 
             links.forEach(function(elem, index) {
-                if (elem.href.indexOf(prevTest) !== -1) {
+                if (elem.href.indexOf(prevTest) !== -1 && links[index + 1]) {
                     location.replace(links[index + 1]);
                 }
             });
