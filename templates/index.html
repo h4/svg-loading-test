@@ -28,7 +28,7 @@
     <script>
         if (location.hash) {
             var prevTest = location.hash.substr(1);
-            var links = [].slice.call(document.links);
+            var links = Array.prototype.slice.call(document.links);
 
             links.forEach(function(elem, index) {
                 if (elem.href.indexOf(prevTest) !== -1) {
