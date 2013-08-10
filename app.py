@@ -7,7 +7,10 @@ import json
 import uuid
 from flask import Flask, make_response, render_template, request, session
 from pymongo import MongoClient
+from numpy import amin, amax, average, median, array
 from time import time
+from itertools import groupby
+
 from settings import ITERATIONS_COUNT, ADMINS
 
 app = Flask('svg')
@@ -116,6 +119,69 @@ def stat():
     res = json.dumps({'time':request.form['time'], 'count': count})
 
     return make_response(res)
+
+
+@app.route('/result/')
+def result_page():
+    return render_template("result.html")
+    pass
+
+
+@app.route('/result/data/')
+def result():
+    """
+    Получение результатов сбора статистики
+    """
+    client = MongoClient('localhost', 27017)
+    db = client.svg
+    stat = db.stat
+
+    data = stat.find({"path": {"$exists": True}, "uid": {"$exists": True}}, fields={"_id": False}).sort([('user_agent', 1), ('path', 1)])
+    res = []
+    for elem in data:
+        elem['uid'] = str(elem['uid'])
+        res.append(elem)
+
+    res = groupby(res, key=lambda x: x['user_agent'])
+
+    data = {}
+
+    for k, v in res:
+        ua_dict = {}
+        for ua, x in groupby(list(v), key=lambda x: x['path']):
+            arr = [int(t['time']) for t in x]
+            ua_dict[ua] = int(average(arr))
+        data[k] = ua_dict
+
+    res = [
+        ["ua", "ext", "emb", "base64", "enc", "ext+rand", "emb+rand", "base64+rand", "enc+rand", ],
+    ]
+
+    def parse_data(elem):
+        ret = []
+        keys = [
+            "/test/external/0/",
+            "/test/embedded/0/",
+            "/test/base64/0/",
+            "/test/encoded/0/",
+            "/test/external/1/",
+            "/test/embedded/1/",
+            "/test/base64/1/",
+            "/test/encoded/1/",
+            ]
+        print elem
+
+        for key in keys:
+            ret.append(elem.get(key) or 0)
+        return ret
+
+    for k in data.keys():
+        row = [k,] + parse_data(data[k])
+        res.append(row)
+
+    response = json.dumps(res)
+
+    return make_response(response)
 
 if not app.debug:
     import logging

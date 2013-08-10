@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Результаты</title>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+
+      function encodePostData(data) {
+            var elem;
+            var result = [];
+            for (elem in data) {
+                result.push(elem + '=' + encodeURIComponent(data[elem]));
+            }
+            return result.join('&');
+        }
+
+      function getResult(url, data, method, callback) {
+            method = method || 'POST';
+            if (!callback) {
+                if (typeof method === "function") {
+                    callback = method;
+                    method = 'POST';
+                }
+            }
+            var xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.open(method, url, true);
+            xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xmlhttp.send(encodePostData(data));
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState != 4) {
+                    return;
+                }
+
+                if (xmlhttp.status == 200) {
+                    callback && callback(xmlhttp.responseText);
+                }
+            };
+        }
+
+      function drawChart(json) {
+        var data = google.visualization.arrayToDataTable(JSON.parse(json));
+
+        var options = {
+          hAxis: {title: 'UA', titleTextStyle: {color: 'red'}}
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart'));
+        chart.draw(data, options);
+      }
+
+        getResult("/result/data/", "", "GET", drawChart);
+    </script>
+</head>
+<body>
+    <div id="chart" style="width: 1200px; height: 500px;"></div>
+</body>
+</html>
